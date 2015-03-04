@@ -51,7 +51,7 @@ public class BuilderProcessor extends AbstractProcessor {
                     String typePackageName = packageElement.getQualifiedName().toString();
                     String packageName = (!builtAnnotation.packageName().equals("")) ? builtAnnotation.packageName() : typePackageName;
                     String extendClass = (!builtAnnotation.extendsClass().equals("")) ? builtAnnotation.extendsClass() : null;
-                    String[] interfaceClasses = (builtAnnotation.implementsInterfaces().length == 0) ? builtAnnotation.implementsInterfaces() : null;
+                    String[] interfaceClasses = (builtAnnotation.implementsInterfaces().length > 0) ? builtAnnotation.implementsInterfaces() : null;
                     String outputSourceFile = join(".", packageName, builderName);
                     jfo = processingEnv.getFiler().createSourceFile(outputSourceFile);
                     processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Generating -> " + outputSourceFile);
