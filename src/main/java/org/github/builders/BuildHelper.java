@@ -24,13 +24,17 @@ import static org.github.builders.generator.Expressions.*;
 import static org.github.builders.generator.Expressions.assignValue;
 import static org.github.builders.generator.StringUtils.concat;
 import static org.github.builders.generator.StringUtils.decapitalize;
+import static org.github.builders.generator.StringUtils.join;
 
 /**
  * Created by julian3 on 15/03/03.
  */
 public class BuildHelper {
-     static ClassBlock createClass(TypeElement classElement, PackageElement packageElement, String typeName, String builderName) {
-        return classBlock(packageElement.getQualifiedName().toString(), builderName)
+     static ClassBlock createClass(TypeElement classElement, String packageName, String typePackageName, String typeName, String builderName, String extendsClass, String[] implementsInterfaces) {
+        return classBlock(packageName, builderName)
+                .extendsClass(extendsClass)
+                .implementsInterface(implementsInterfaces)
+                .importClass(join(".",typePackageName,typeName))
                 .field(Modifier.PRIVATE, classElement.getSimpleName().toString(), "val")
                 .constructor(Block.constructorBlock(builderName, new BlockHandler() {
                     @Override

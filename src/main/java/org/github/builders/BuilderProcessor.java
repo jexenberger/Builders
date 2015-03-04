@@ -4,9 +4,8 @@ import org.github.builders.generator.BeanUtils;
 import org.github.builders.generator.ClassBlock;
 
 import javax.annotation.processing.*;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.BufferedWriter;
@@ -23,6 +22,7 @@ import static org.github.builders.generator.StringUtils.join;
  * Created by julian3 on 15/03/03.
  */
 @SupportedAnnotationTypes("org.github.builders.Built")
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class BuilderProcessor extends AbstractProcessor {
 
 
@@ -36,23 +36,28 @@ public class BuilderProcessor extends AbstractProcessor {
         int sourceVersion = processingEnv.getSourceVersion().ordinal();
         boolean useLambdas = sourceVersion >= 8;
         if (!useLambdas) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "unable to use Lambdas at source level " + processingEnv.getSourceVersion() + "(" + sourceVersion + ")");
+            printMessage("unable to use Lambdas at source level " + processingEnv.getSourceVersion() + "(" + sourceVersion + ")");
         }
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Built.class);
         for (Element element : elements) {
             if (element.getKind().equals(ElementKind.CLASS)) {
                 TypeElement classElement = (TypeElement) element;
+                Built builtAnnotation = classElement.getAnnotation(Built.class);
                 PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
                 JavaFileObject jfo = null;
                 try {
                     String typeName = classElement.getSimpleName().toString();
-                    String builderName = typeName + "Builder";
-                    String outputSourceFile = join(".",packageElement.getQualifiedName().toString(), builderName);
+                    String builderName = (!builtAnnotation.name().equals("")) ? builtAnnotation.name() : concat(typeName,"Builder");
+                    String typePackageName = packageElement.getQualifiedName().toString();
+                    String packageName = (!builtAnnotation.packageName().equals("")) ? builtAnnotation.packageName() : typePackageName;
+                    String extendClass = (!builtAnnotation.extendsClass().equals("")) ? builtAnnotation.extendsClass() : null;
+                    String[] interfaceClasses = (builtAnnotation.implementsInterfaces().length == 0) ? builtAnnotation.implementsInterfaces() : null;
+                    String outputSourceFile = join(".", packageName, builderName);
                     jfo = processingEnv.getFiler().createSourceFile(outputSourceFile);
                     processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Generating -> " + outputSourceFile);
                     BufferedWriter bw = new BufferedWriter(jfo.openWriter());
 
-                    ClassBlock classBlock = createClass(classElement, packageElement, typeName, builderName);
+                    ClassBlock classBlock = createClass(classElement, packageName, typePackageName, typeName, builderName, extendClass, interfaceClasses);
                     Map<String, Pair<String, ExecutableElement>> setters = new LinkedHashMap<String, Pair<String, ExecutableElement>>();
                     Map<String, String> getters = new LinkedHashMap<String, String>();
                     List<? extends Element> enclosedElements = classElement.getEnclosedElements();
@@ -95,7 +100,9 @@ public class BuilderProcessor extends AbstractProcessor {
         return true;
     }
 
-
+    private void printMessage(String msg) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, msg);
+    }
 
 
 }

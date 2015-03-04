@@ -1,0 +1,1 @@
+Builders is an [Annotation Processor](http://docs.oracle.com/javase/7/docs/jdk/api/apt/mirror/com/sun/mirror/apt/AnnotationProcessor.html) which generates a [Fluent](http://en.wikipedia.org/wiki/Fluent_interface) [Builder](http://en.wikipedia.org/wiki/Builder_pattern) which can then be used to create and/or populate objects.
