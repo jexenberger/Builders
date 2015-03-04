@@ -10,6 +10,6 @@ Builders will then do the following:
 * A *fromMap* method which takes a [java.util.Map](http://docs.oracle.com/javase/7/docs/api/java/util/Map.html), to populate your type instance from a Map.
 * A *toMap* method which populates and returns a [java.util.Map](http://docs.oracle.com/javase/7/docs/api/java/util/Map.html) of your type instance.
 * If you are using Java 8, Builders will also generate:
-* A builder method for each setter method which accepts a [java.util.function.Supplier](http://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html) to return the value.
+  * A builder method for each setter method which accepts a [java.util.function.Supplier](http://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html) to return the value.
   * A builder method for each setter method which accepts a [java.util.function.Function](http://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html) giving the instance and returning the value.
   * A static constructor method accepts a [java.util.function.Supplier](http://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html) to return an instance of your type.
